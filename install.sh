@@ -1,31 +1,21 @@
 #!/bin/bash
 
-# Exit on any error
-set -e
+echo "Installing SDGrabber..."
 
-echo "Installing required system packages..."
-# Update package list and install git
+# Install required system packages
 sudo apt-get update
-sudo apt-get install -y git python3-pip python3-rpi.gpio
-
-echo "Installing SDGrabber service..."
+sudo apt-get install -y python3-rpi.gpio
 
 # Create log file and set permissions
 sudo touch /var/log/sdgrabber.log
 sudo chown $USER:$USER /var/log/sdgrabber.log
 
-# Install Python dependencies
-pip3 install -r requirements.txt
-
-# Copy service file to systemd directory
+# Copy service file to systemd
 sudo cp sdgrabber.service /etc/systemd/system/
 
-# Reload systemd daemon
+# Reload systemd and enable service
 sudo systemctl daemon-reload
-
-# Enable and start the service
 sudo systemctl enable sdgrabber.service
 sudo systemctl start sdgrabber.service
 
-echo "Installation complete! The service is now running."
-echo "You can check its status with: sudo systemctl status sdgrabber"
+echo "Installation complete! Check status with: sudo systemctl status sdgrabber"

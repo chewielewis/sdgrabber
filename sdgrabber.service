@@ -3,12 +3,12 @@ Description=SDGrabber Service
 After=network.target
 
 [Service]
-Type=simple
-User=pi
-WorkingDirectory=/home/pi/sdgrabber
 ExecStart=/usr/bin/python3 /home/pi/sdgrabber/main.py
+WorkingDirectory=/home/pi/sdgrabber
+StandardOutput=inherit
+StandardError=inherit
 Restart=always
-RestartSec=5
+User=pi
 
 [Install]
 WantedBy=multi-user.target
