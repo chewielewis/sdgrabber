@@ -20,9 +20,11 @@ logging.basicConfig(
 )
 
 # GPIO setup
-LED_PIN = 16
+LED_PIN_1 = 16    # First LED
+LED_PIN_2 = 20    # Second LED (using GPIO 20)
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(LED_PIN, GPIO.OUT)
+GPIO.setup(LED_PIN_1, GPIO.OUT)
+GPIO.setup(LED_PIN_2, GPIO.OUT)
 
 def cleanup(signum, frame):
     """Clean up GPIO on exit"""
@@ -35,12 +37,16 @@ signal.signal(signal.SIGTERM, cleanup)
 signal.signal(signal.SIGINT, cleanup)
 
 def main():
-    logging.info("Starting SDGrabber service")
+    logging.info("Starting SDGrabber service with alternating LEDs")
     try:
         while True:
-            GPIO.output(LED_PIN, GPIO.HIGH)
+            # First LED on, Second LED off
+            GPIO.output(LED_PIN_1, GPIO.HIGH)
+            GPIO.output(LED_PIN_2, GPIO.LOW)
             time.sleep(0.5)
-            GPIO.output(LED_PIN, GPIO.LOW)
+            # First LED off, Second LED on
+            GPIO.output(LED_PIN_1, GPIO.LOW)
+            GPIO.output(LED_PIN_2, GPIO.HIGH)
             time.sleep(0.5)
     except Exception as e:
         logging.error(f"Error in main loop: {e}")
