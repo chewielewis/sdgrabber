@@ -20,7 +20,7 @@ if [ ! -d "$MOUNT_POINT" ]; then
 fi
 
 # Mount the device
-mount "$DEVICE" "$MOUNT_POINT"
+sudo mount "$DEVICE" "$MOUNT_POINT"
 
 if [ $? -eq 0 ]; then
     log_message "Successfully mounted SD card at $MOUNT_POINT"
