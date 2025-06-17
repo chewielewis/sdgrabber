@@ -10,4 +10,4 @@ ExecStart=/bin/mount -t cifs //10.1.1.98/Projects/sdgrabber /mnt/backup_server -
 ExecStop=/bin/umount /mnt/backup_server
 
 [Install]
-WantedBy=multi-user.targetq
+WantedBy=multi-user.target
