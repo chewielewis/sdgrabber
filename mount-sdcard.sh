@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # wait 1 second to ensure the device is ready
+sleep 1
 
 # Get the device name passed from udev
 DEVICE="/dev/$1"
