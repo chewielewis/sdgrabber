@@ -3,7 +3,7 @@
 # test 
 
 
-import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO # type: ignore
 import time
 import logging
 import signal

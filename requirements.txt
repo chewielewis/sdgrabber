@@ -1,1 +1,2 @@
 RPi.GPIO==0.7.1
+# No additional pip requirements needed - using system packages
