@@ -1,0 +1,1 @@
+ACTION=="add", KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", RUN+="/usr/local/bin/mount-sdcard.sh '%k'"
