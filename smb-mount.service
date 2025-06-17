@@ -6,7 +6,7 @@ Before=sdgrabber.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/bin/mount -t cifs //SERVER_IP/SHARE_NAME /mnt/backup_server -o credentials=/etc/samba/credentials,vers=3.0,uid=pi,gid=pi
+ExecStart=/bin/mount -t cifs //10.1.1.89/Projects/sdgrabber /mnt/backup_server -o credentials=/etc/samba/credentials,vers=3.0,uid=pi,gid=pi
 ExecStop=/bin/umount /mnt/backup_server
 
 [Install]
