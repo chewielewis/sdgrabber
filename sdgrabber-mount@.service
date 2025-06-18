@@ -1,0 +1,11 @@
+[Unit]
+Description=Mount SD card device %I
+After=dev-%i.device
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/mount-sdcard.sh %I
+
+[Install]
+WantedBy=multi-user.target

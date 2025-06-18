@@ -1,50 +1,47 @@
 #!/bin/bash
 
-# Set PATH explicitly for udev environment
-PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+# Wait for device to be fully available
+sleep 2
 
-# Get the device name passed from udev
+# Set full paths for all commands
+MOUNT="/bin/mount"
+MKDIR="/bin/mkdir"
+CHMOD="/bin/chmod"
+CHOWN="/bin/chown"
+BLKID="/sbin/blkid"
+
+# Device and mount point
 DEVICE="/dev/$1"
-
-# Mount point
 MOUNT_POINT="/mnt/sdcard"
 
-# Log file
-LOG_FILE="/var/log/sdgrabber.log"
-
-# Function to log messages
+# Log with timestamp
 log_message() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> /var/log/sdgrabber.log
 }
 
-# Debug info
-log_message "Starting mount script for device: $DEVICE"
-log_message "Current user: $(whoami)"
-log_message "Mount point permissions: $(ls -ld $MOUNT_POINT)"
+log_message "Starting mount script with device: $DEVICE"
 
-# Check if device exists
-if [ ! -b "$DEVICE" ]; then
-    log_message "Error: Device $DEVICE does not exist"
-    exit 1
+# Ensure mount point exists
+if [ ! -d "$MOUNT_POINT" ]; then
+    $MKDIR -p "$MOUNT_POINT"
 fi
+
+# Set mount point permissions
+$CHMOD 777 "$MOUNT_POINT"
 
 # Get filesystem type
-FS_TYPE=$(/usr/sbin/blkid -s TYPE -o value "$DEVICE")
-log_message "Filesystem type detected: $FS_TYPE"
+FS_TYPE=$($BLKID -s TYPE -o value "$DEVICE")
+log_message "Detected filesystem: $FS_TYPE"
 
-# Try mounting with different options
-if /bin/mount -o rw,users,umask=000 "$DEVICE" "$MOUNT_POINT"; then
-    log_message "Successfully mounted $DEVICE at $MOUNT_POINT"
-    /bin/chmod 777 "$MOUNT_POINT"
-    log_message "Updated mount point permissions: $(ls -ld $MOUNT_POINT)"
+# Attempt mount
+$MOUNT -o rw,users "$DEVICE" "$MOUNT_POINT"
+MOUNT_STATUS=$?
+
+if [ $MOUNT_STATUS -eq 0 ]; then
+    log_message "Successfully mounted $DEVICE"
+    $CHMOD 777 "$MOUNT_POINT"
 else
-    log_message "Failed to mount. Trying alternative mount options..."
-    if /bin/mount "$DEVICE" "$MOUNT_POINT"; then
-        log_message "Basic mount successful"
-    else
-        MOUNT_ERROR=$(/bin/mount "$DEVICE" "$MOUNT_POINT" 2>&1)
-        log_message "Mount failed with error: $MOUNT_ERROR"
-        log_message "Device info: $(/usr/sbin/blkid "$DEVICE")"
-        exit 1
-    fi
+    log_message "Mount failed with status $MOUNT_STATUS"
 fi
+
+exit $MOUNT_STATUS

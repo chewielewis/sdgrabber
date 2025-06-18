@@ -27,6 +27,7 @@ sudo chown $USER:$USER /var/log/sdgrabber.log
 # Copy service files to systemd
 sudo cp sdgrabber.service /etc/systemd/system/
 sudo cp smb-mount.service /etc/systemd/system/
+sudo cp sdgrabber-mount@.service /etc/systemd/system/
 
 # Reload udev rules
 sudo udevadm control --reload-rules
