@@ -19,43 +19,32 @@ log_message() {
 
 # Debug info
 log_message "Starting mount script for device: $DEVICE"
+log_message "Current user: $(whoami)"
+log_message "Mount point permissions: $(ls -ld $MOUNT_POINT)"
 
-# Sleep briefly to ensure device is ready
-sleep 2
-
-# Make sure mount point exists with correct permissions
-if [ ! -d "$MOUNT_POINT" ]; then
-    /usr/bin/mkdir -p "$MOUNT_POINT"
-    /usr/bin/chown root:root "$MOUNT_POINT"
-    /usr/bin/chmod 755 "$MOUNT_POINT"
-    log_message "Created mount point: $MOUNT_POINT with permissions"
+# Check if device exists
+if [ ! -b "$DEVICE" ]; then
+    log_message "Error: Device $DEVICE does not exist"
+    exit 1
 fi
 
 # Get filesystem type
 FS_TYPE=$(/usr/sbin/blkid -s TYPE -o value "$DEVICE")
 log_message "Filesystem type detected: $FS_TYPE"
 
-# Mount the device with appropriate options based on filesystem
-case $FS_TYPE in
-    vfat|fat32)
-        /bin/mount -t vfat -o rw,uid=1000,gid=1000,umask=000 "$DEVICE" "$MOUNT_POINT"
-        ;;
-    exfat)
-        /bin/mount -t exfat -o rw,uid=1000,gid=1000 "$DEVICE" "$MOUNT_POINT"
-        ;;
-    ntfs)
-        /bin/mount -t ntfs -o rw,uid=1000,gid=1000 "$DEVICE" "$MOUNT_POINT"
-        ;;
-    *)
-        /bin/mount -o rw,uid=1000,gid=1000 "$DEVICE" "$MOUNT_POINT"
-        ;;
-esac
-
-MOUNT_STATUS=$?
-if [ $MOUNT_STATUS -eq 0 ]; then
+# Try mounting with different options
+if /bin/mount -o rw,users,umask=000 "$DEVICE" "$MOUNT_POINT"; then
     log_message "Successfully mounted $DEVICE at $MOUNT_POINT"
-    # Set permissions after successful mount
-    /usr/bin/chown -R pi:pi "$MOUNT_POINT"
+    /bin/chmod 777 "$MOUNT_POINT"
+    log_message "Updated mount point permissions: $(ls -ld $MOUNT_POINT)"
 else
-    log_message "Failed to mount $DEVICE. Exit code: $MOUNT_STATUS"
+    log_message "Failed to mount. Trying alternative mount options..."
+    if /bin/mount "$DEVICE" "$MOUNT_POINT"; then
+        log_message "Basic mount successful"
+    else
+        MOUNT_ERROR=$(/bin/mount "$DEVICE" "$MOUNT_POINT" 2>&1)
+        log_message "Mount failed with error: $MOUNT_ERROR"
+        log_message "Device info: $(/usr/sbin/blkid "$DEVICE")"
+        exit 1
+    fi
 fi

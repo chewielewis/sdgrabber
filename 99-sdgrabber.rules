@@ -1,1 +1,4 @@
-KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", ACTION=="add", MODE="0660", GROUP="pi", RUN+="/bin/bash -c '/usr/local/bin/mount-sdcard.sh %k >> /var/log/sdgrabber.log 2>&1 &'"
+KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", ACTION=="add", \
+  ENV{ID_FS_USAGE}=="filesystem", \
+  MODE="0666", \
+  RUN+="/bin/bash -c '/usr/local/bin/mount-sdcard.sh %k >> /var/log/sdgrabber.log 2>&1'"
