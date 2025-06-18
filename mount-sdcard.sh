@@ -3,11 +3,11 @@
 # Wait for device to be fully available
 sleep 2
 
-# Set full paths for all commands
+# Set full paths
 MOUNT="/bin/mount"
+UMOUNT="/bin/umount"
 MKDIR="/bin/mkdir"
 CHMOD="/bin/chmod"
-CHOWN="/bin/chown"
 BLKID="/sbin/blkid"
 
 # Device and mount point
@@ -20,6 +20,12 @@ log_message() {
 }
 
 log_message "Starting mount script with device: $DEVICE"
+
+# Check if something is already mounted
+if mountpoint -q "$MOUNT_POINT"; then
+    log_message "Unmounting existing device from $MOUNT_POINT"
+    $UMOUNT "$MOUNT_POINT"
+fi
 
 # Ensure mount point exists
 if [ ! -d "$MOUNT_POINT" ]; then
