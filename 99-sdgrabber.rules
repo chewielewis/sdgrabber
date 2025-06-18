@@ -1,2 +1,5 @@
+# Handle device addition
 ACTION=="add", KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", TAG+="systemd", ENV{SYSTEMD_WANTS}="sdgrabber-mount@%k.service"
-ACTION=="remove", KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", RUN+="/usr/local/bin/unmount-sdcard.sh"
+
+# Handle device removal
+ACTION=="remove", KERNEL=="sd[a-z][0-9]", SUBSYSTEMS=="usb", TAG+="systemd", ENV{SYSTEMD_WANTS}="sdgrabber-unmount.service"

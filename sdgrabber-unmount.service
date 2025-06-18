@@ -1,0 +1,11 @@
+[Unit]
+Description=Unmount SD card
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/local/bin/unmount-sdcard.sh
+
+[Install]
+WantedBy=multi-user.target
